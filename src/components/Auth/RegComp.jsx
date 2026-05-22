@@ -1,47 +1,45 @@
 import React, { useState } from 'react'
-import { useNavigate } from "react-router-dom";
 import logo from '../../assets/logo.webp'
 import api from '../../lib/api.js'
 import { useToast } from '../global/Toast.jsx'
 import Loading from '../global/Loading.jsx'
-const LoginComp = ({ updateForm }) => {
-    const nav = useNavigate()
+
+const RegisterComp = ({ updateForm }) => {
     const toast = useToast()
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [username, setUsername] = useState(null);
-    const [isLoading, setisLoading] = useState(false);
+    const [formData, setFormData] = useState({ username: '', email: '', password: '' })
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleSubmit = async () => {
-        setisLoading(true)
-        try {
-            const data = await api.post('/auth/register', { email, username, password })
-            sessionStorage.setItem('accessToken', data.accessToken)
+        if (!formData.username || !formData.email || !formData.password) return toast.error('Error', 'All fields are required')
 
-            setisLoading(false)
-            toast.success('Account created!', 'Check your inbox to verify')
-        }
-        catch (error) {
-            setisLoading(false)
+        setIsLoading(true)
+        try {
+            await api.post('/auth/register', formData)
+            toast.success('Account created!', 'Check your inbox to verify your email')
+            updateForm(true) // Switch to login
+        } catch (error) {
             toast.error('Register failed', error.message)
+        } finally {
+            setIsLoading(false)
         }
     }
-    if (isLoading) { return <Loading /> }
+
+    if (isLoading) return <Loading />
+
     return (
-        <div className='flex flex-col items-center justify-center w-3/12 h-8/12 bg-(--lc-surface) rounded-2xl border-(--lc-border-lit) border shadow-(--lc-glow-md)'>
-            <div className='w-full h-full flex flex-col justify-center items-center'>
-                <img src={logo} alt='Logo' width={100} height={100} />
-                <h1 className='text-xl  font-semibold text-(--lc-text) mb-4'>Lunar<span style={{ color: 'var(--lc-purple)' }}>cord</span> register</h1>
-                <input className='w-9/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold pl-2 outline-0 border border-(--lc-border) mb-4 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='text' onChange={(event) => setUsername(event.target.value)} name='username' placeholder='username' autoComplete='one-time-code' required />
-                <input className='w-9/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold pl-2 outline-0 border border-(--lc-border) mb-4 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='email' onChange={(event) => setEmail(event.target.value)} name='Email' placeholder='Email' autoComplete='one-time-code' required />
-                <input className='w-9/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold pl-2 outline-0 border border-(--lc-border) mb-1 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='password' onChange={(event) => setPassword(event.target.value)} name='Password' placeholder='Password' autoComplete='one-time-code' required />
-                <input className='w-3/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold outline-0 border border-(--lc-border) mt-4 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='button' name='Register' value='Register' onClick={handleSubmit} />
-                <div className='w-full h-30 mt-8 flex justify-center'>
-                    <h1 className='text-(--lc-text) text-sm mb-4'>Already have an account? <span className='text-(--lc-info) cursor-pointer' onClick={() => { updateForm(true) }}>Login</span></h1>
-                </div>
-            </div>
+        <div className='flex flex-col items-center justify-center w-full max-w-sm p-8 bg-(--lc-surface) rounded-2xl border border-(--lc-border-lit) shadow-(--lc-glow-md)'>
+            <img src={logo} alt='Logo' width={80} height={80} className='mb-4' />
+            <h1 className='text-xl font-semibold text-(--lc-text) mb-6'>Lunar<span className='text-(--lc-purple)'>cord</span> Register</h1>
+
+            <input className='w-full h-10 rounded-xl bg-(--lc-surface-2) text-(--lc-text) pl-3 border border-(--lc-border) mb-4 outline-none' type='text' placeholder='Username' onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
+            <input className='w-full h-10 rounded-xl bg-(--lc-surface-2) text-(--lc-text) pl-3 border border-(--lc-border) mb-4 outline-none' type='email' placeholder='Email' onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+            <input className='w-full h-10 rounded-xl bg-(--lc-surface-2) text-(--lc-text) pl-3 border border-(--lc-border) outline-none' type='password' placeholder='Password' onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+
+            <button className='w-full h-10 mt-6 rounded-xl bg-(--lc-purple) text-white font-bold hover:opacity-90 transition-opacity' onClick={handleSubmit}>Register</button>
+
+            <p className='text-(--lc-text) text-sm mt-8'>Already have an account? <span className='text-(--lc-info) cursor-pointer' onClick={() => updateForm(true)}>Login</span></p>
         </div>
     )
 }
 
-export default LoginComp
+export default RegisterComp

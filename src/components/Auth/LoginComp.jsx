@@ -13,47 +13,38 @@ const LoginComp = ({ updateForm }) => {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      toast.error('Missing fields', 'Please enter your email and password')
-      return
-    }
+    if (!email || !password) return toast.error('Missing fields', 'Please enter email and password')
 
     setLoading(true)
-
     try {
-      const data = await api.post('/auth/login', { email, password })
+      const data = await api.post('/auth/login', { email: email.trim(), password })
       sessionStorage.setItem('accessToken', data.accessToken)
-      toast.success('Welcome back!', `Logged in as ${data.user.username}`, 3000)
+      toast.success('Welcome back!', `Logged in as ${data.user.username}`)
       nav('/dashboard')
     } catch (error) {
       setLoading(false)
-      if (error.status === 403) {
-        toast.warning('Email not verified', 'Please check your inbox and verify your email before logging in.')
-      } else if (error.status === 401) {
-        toast.error('Login failed', 'Invalid email or password')
-      } else {
-        toast.error('Something went wrong', error.message || 'Please try again')
-      }
+      const messages = { 403: 'Verify your email first.', 401: 'Invalid credentials.' }
+      toast.error('Login failed', messages[error.status] || error.message)
     }
   }
 
   if (loading) return <Loading />
 
   return (
-    <div className='flex flex-col items-center justify-center w-3/12 h-8/12 bg-(--lc-surface) rounded-2xl border-(--lc-border-lit) border shadow-(--lc-glow-md)'>
-      <div className='w-full h-full flex flex-col justify-center items-center'>
-        <img src={logo} alt='Logo' width={100} height={100} />
-        <h1 className='text-xl font-semibold text-(--lc-text) mb-4'>Lunar<span style={{ color: 'var(--lc-purple)' }}>cord</span> login</h1>
-        <input className='w-9/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold pl-2 outline-0 border border-(--lc-border) mb-4 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='email' onChange={(event) => setEmail(event.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} name='Email' placeholder='Email' autoComplete='one-time-code' required />
-        <input className='w-9/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold pl-2 outline-0 border border-(--lc-border) my-1 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md)' type='password' onChange={(event) => setPassword(event.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} name='Password' placeholder='Password' autoComplete='one-time-code' required />
-        <div className='w-9/12 flex justify-end mt-1 mb-2'>
-          <span className='text-(--lc-info) text-xs cursor-pointer' onClick={() => nav('/forgot-password')}>Forgot password?</span>
-        </div>
-        <input className='w-3/12 h-10 rounded-2xl bg-(--lc-surface-2) text-(--lc-text) font-semibold outline-0 border border-(--lc-border) mt-4 hover:border-(--lc-border-lit) hover:shadow-(--lc-glow-md) cursor-pointer' type='button' name='Login' value='Login' onClick={handleSubmit} />
-        <div className='w-full h-30 mt-8 flex justify-center'>
-          <h1 className='text-(--lc-text) text-sm mb-4'>Don't have an account? <span className='text-(--lc-info) cursor-pointer' onClick={() => { updateForm(false) }}>Register</span></h1>
-        </div>
+    <div className='flex flex-col items-center justify-center w-full max-w-sm p-8 bg-(--lc-surface) rounded-2xl border border-(--lc-border-lit) shadow-(--lc-glow-md)'>
+      <img src={logo} alt='Logo' width={80} height={80} className='mb-4' />
+      <h1 className='text-xl font-semibold text-(--lc-text) mb-6'>Lunar<span className='text-(--lc-purple)'>cord</span> Login</h1>
+
+      <input className='w-full h-10 rounded-xl bg-(--lc-surface-2) text-(--lc-text) pl-3 border border-(--lc-border) focus:border-(--lc-purple) outline-none mb-4' type='email' placeholder='Email' onChange={(e) => setEmail(e.target.value)} />
+      <input className='w-full h-10 rounded-xl bg-(--lc-surface-2) text-(--lc-text) pl-3 border border-(--lc-border) focus:border-(--lc-purple) outline-none' type='password' placeholder='Password' onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} />
+
+      <div className='w-full flex justify-end mt-2'>
+        <span className='text-(--lc-info) text-xs cursor-pointer' onClick={() => nav('/forgot-password')}>Forgot password?</span>
       </div>
+
+      <button className='w-full h-10 mt-6 rounded-xl bg-(--lc-purple) text-white font-bold hover:opacity-90 transition-opacity' onClick={handleSubmit}>Login</button>
+
+      <p className='text-(--lc-text) text-sm mt-8'>Don't have an account? <span className='text-(--lc-info) cursor-pointer' onClick={() => updateForm(false)}>Register</span></p>
     </div>
   )
 }
