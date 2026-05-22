@@ -14,30 +14,29 @@ const getHeaders = () => {
   }
 }
 
-const handleResponse = async (res, startTime) => {
-  lastLatency = Math.round(performance.now() - startTime)
-
-  if (!res.ok) throw { status: res.status, message: 'Latency check failed' }
-  return lastLatency
+const handleResponse = async (res) => {
+  const data = await res.json()
+  if (!res.ok) throw { status: res.status, message: data.error || 'Something went wrong' }
+  return data
 }
 
 const api = {
+
   // Returns the cached latency from the last request
   getLastLatency: () => lastLatency,
 
-  // NEW: Triggers a HEAD request to '/' and returns the duration
+  // Triggers a HEAD request and returns round trip ms
   latency: async () => {
     const start = performance.now()
     try {
-      // Using HEAD method is faster as it ignores the response body
-      const res = await fetch(`${BASE_URL}/`, {
+      await fetch(`${BASE_URL}/health`, {
         method: 'HEAD',
-        headers: getHeaders(),
         credentials: 'include'
       })
-      return handleResponse(res, start)
+      lastLatency = Math.round(performance.now() - start)
+      return lastLatency
     } catch (err) {
-      console.error('Latency check failed:', err)
+      console.error('[API] Latency check failed:', err)
       return null
     }
   },
@@ -49,12 +48,56 @@ const api = {
       headers: getHeaders(),
       credentials: 'include'
     })
-    // Updated to return the latency-tracked response
-    await handleResponse(res, start)
-    return await res.json()
+    lastLatency = Math.round(performance.now() - start)
+    return handleResponse(res)
   },
 
-  // ... keep post, put, patch, delete as previously defined
+  post: async (endpoint, body) => {
+    const start = performance.now()
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(body)
+    })
+    lastLatency = Math.round(performance.now() - start)
+    return handleResponse(res)
+  },
+
+  put: async (endpoint, body) => {
+    const start = performance.now()
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(body)
+    })
+    lastLatency = Math.round(performance.now() - start)
+    return handleResponse(res)
+  },
+
+  patch: async (endpoint, body) => {
+    const start = performance.now()
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(body)
+    })
+    lastLatency = Math.round(performance.now() - start)
+    return handleResponse(res)
+  },
+
+  delete: async (endpoint) => {
+    const start = performance.now()
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+      credentials: 'include'
+    })
+    lastLatency = Math.round(performance.now() - start)
+    return handleResponse(res)
+  }
 }
 
 export default api
