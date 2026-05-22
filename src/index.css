@@ -1,0 +1,67 @@
+@import "tailwindcss";
+:root {
+  /* ── backgrounds ── */
+  --lc-bg:         #080010;  /* deep neon black — main app background */
+  --lc-surface:    #0f0020;  /* slightly lighter — cards, sidebars */
+  --lc-surface-2:  #160030;  /* elevated surfaces — inputs, pills */
+  --lc-surface-3:  #1e0040;  /* hover states, selected items */
+  /* ── neon purple accent family ── */
+  --lc-purple:      #bf00ff;  /* primary accent — buttons, active states */
+  --lc-purple-dim:  #7a00cc;  /* muted purple — hover, pressed */
+  --lc-purple-glow: #e060ff;  /* lighter purple — highlights, icons */
+  /* ── semantic colors ── */
+  --lc-success:    #00ff88;  /* neon green — online, approved */
+  --lc-danger:     #ff2d55;  /* neon red — offline, denied, delete */
+  --lc-warning:    #ffaa00;  /* neon amber — warnings, inactive */
+  --lc-info:       #00d4ff;  /* neon cyan — info, links */
+  /* ── text ── */
+  --lc-text:       #f5e6ff;  /* primary text — slight purple tint */
+  --lc-muted:      #7755aa;  /* secondary text, labels */
+  --lc-subtle:     #2a0055;  /* very muted — dividers, placeholders */
+  /* ── borders — neon purple tinted ── */
+  --lc-border:     #4400aa;  /* default border — neon purple */
+  --lc-border-lit: #bf00ff;  /* hover/focus border — full neon */
+  --lc-border-dim: #220055;  /* subtle border — very dark purple */
+  /* ── shadows / glows ── */
+  --lc-glow-sm:     0 0 10px rgba(191, 0, 255, 0.3);
+  --lc-glow-md:     0 0 20px rgba(191, 0, 255, 0.5);
+  --lc-glow-lg:     0 0 40px rgba(191, 0, 255, 0.7);
+  --lc-glow-btn:    0 0 18px rgba(191, 0, 255, 0.6);
+  --lc-glow-input:  0 0 14px rgba(191, 0, 255, 0.35);
+  --lc-glow-danger: 0 0 15px rgba(255, 45, 85, 0.5);
+  --lc-glow-success:0 0 15px rgba(0, 255, 136, 0.5);
+  /* ── sidebar icons ── */
+  --lc-icon-default:  #7755aa;
+  --lc-icon-active:   #e060ff;
+  --lc-icon-hover:    #bf00ff;
+  --lc-icon-danger:   #ff2d55;
+  --lc-icon-success:  #00ff88;
+  --lc-icon-bg:       #1a0035;
+  --lc-icon-bg-hover: #260050;
+}
+/* ── custom scrollbar ── */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--lc-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--lc-surface-3);
+    border: 2px solid var(--lc-bg);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--lc-purple-dim);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--lc-purple);
+  }
+  /* Firefox support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--lc-surface-3) var(--lc-bg);
+  }
+}
