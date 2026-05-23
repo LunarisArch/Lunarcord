@@ -1,8 +1,5 @@
-const DEV_URL = import.meta.env.VITE_API_DEV
-const PROD_URL = import.meta.env.VITE_API_PROD
-
 const ENV = 'development'
-const BASE_URL = ENV === 'production' ? PROD_URL : DEV_URL
+const BASE_URL = 'https://lunarcord-backend.onrender.com'
 
 let lastLatency = 0
 
